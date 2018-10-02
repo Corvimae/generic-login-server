@@ -1,0 +1,34 @@
+version: '3.4'
+
+services:
+  authserver:
+    container_name: "authserver"
+    image: ${DOCKER_REGISTRY}authserver
+    build:
+      context: ./AuthServer
+      dockerfile: authserver.development.dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - "db"
+    networks:
+      - authserver-network
+  db:
+    container_name: "authserver-db"
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_DB: "authserver"
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    networks:
+      - authserver-network
+
+networks:
+  authserver-network:
+    driver: bridge
